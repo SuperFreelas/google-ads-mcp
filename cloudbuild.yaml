@@ -1,0 +1,28 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/google-ads-mcp', '.']
+
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/google-ads-mcp']
+
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'google-ads-mcp'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/google-ads-mcp'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'GOOGLE_ADS_CLIENT_ID=${_GOOGLE_ADS_CLIENT_ID},GOOGLE_ADS_CLIENT_SECRET=${_GOOGLE_ADS_CLIENT_SECRET},GOOGLE_ADS_DEVELOPER_TOKEN=${_GOOGLE_ADS_DEVELOPER_TOKEN},GOOGLE_ADS_CUSTOMER_ID=${_GOOGLE_ADS_CUSTOMER_ID},GOOGLE_ADS_REFRESH_TOKEN=${_GOOGLE_ADS_REFRESH_TOKEN}'
+
+images:
+  - 'gcr.io/$PROJECT_ID/google-ads-mcp' 

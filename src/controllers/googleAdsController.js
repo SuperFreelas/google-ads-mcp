@@ -4,9 +4,16 @@ const { logger } = require('../utils/logger');
 class GoogleAdsController {
   constructor() {
     this.googleAdsService = new GoogleAdsService();
+    // Bind methods to maintain context
+    this.updateBidAndBudget = this.updateBidAndBudget.bind(this);
+    this.getBidAndBudgetStatus = this.getBidAndBudgetStatus.bind(this);
+    this.getCampaignPerformance = this.getCampaignPerformance.bind(this);
+    this.getCampaignMetrics = this.getCampaignMetrics.bind(this);
+    this.getCreativePerformance = this.getCreativePerformance.bind(this);
+    this.getCreativeMetrics = this.getCreativeMetrics.bind(this);
   }
 
-  async updateBidAndBudget(req, res) {
+  updateBidAndBudget = async (req, res) => {
     try {
       const { campaignId, newBid, newBudget } = req.body;
       const result = await this.googleAdsService.updateBidAndBudget(campaignId, newBid, newBudget);
@@ -17,7 +24,7 @@ class GoogleAdsController {
     }
   }
 
-  async getBidAndBudgetStatus(req, res) {
+  getBidAndBudgetStatus = async (req, res) => {
     try {
       const { campaignId } = req.query;
       const status = await this.googleAdsService.getBidAndBudgetStatus(campaignId);
@@ -28,7 +35,7 @@ class GoogleAdsController {
     }
   }
 
-  async getCampaignPerformance(req, res) {
+  getCampaignPerformance = async (req, res) => {
     try {
       const { campaignId, dateRange } = req.query;
       const performance = await this.googleAdsService.getCampaignPerformance(campaignId, dateRange);
@@ -39,7 +46,7 @@ class GoogleAdsController {
     }
   }
 
-  async getCampaignMetrics(req, res) {
+  getCampaignMetrics = async (req, res) => {
     try {
       const { campaignId, metrics } = req.query;
       const campaignMetrics = await this.googleAdsService.getCampaignMetrics(campaignId, metrics);
@@ -50,7 +57,7 @@ class GoogleAdsController {
     }
   }
 
-  async getCreativePerformance(req, res) {
+  getCreativePerformance = async (req, res) => {
     try {
       const { creativeId, dateRange } = req.query;
       const performance = await this.googleAdsService.getCreativePerformance(creativeId, dateRange);
@@ -61,7 +68,7 @@ class GoogleAdsController {
     }
   }
 
-  async getCreativeMetrics(req, res) {
+  getCreativeMetrics = async (req, res) => {
     try {
       const { creativeId, metrics } = req.query;
       const creativeMetrics = await this.googleAdsService.getCreativeMetrics(creativeId, metrics);

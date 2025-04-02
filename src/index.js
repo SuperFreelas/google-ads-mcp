@@ -3,7 +3,19 @@ const dotenv = require('dotenv');
 const { GoogleAdsController } = require('./controllers/googleAdsController');
 const { logger } = require('./utils/logger');
 
+// Load environment variables
 dotenv.config();
+
+// Log environment variables (without sensitive data)
+logger.info('Environment loaded:', {
+  port: process.env.PORT,
+  nodeEnv: process.env.NODE_ENV,
+  hasClientId: !!process.env.GOOGLE_ADS_CLIENT_ID,
+  hasClientSecret: !!process.env.GOOGLE_ADS_CLIENT_SECRET,
+  hasDeveloperToken: !!process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
+  hasCustomerId: !!process.env.GOOGLE_ADS_CUSTOMER_ID,
+  hasRefreshToken: !!process.env.GOOGLE_ADS_REFRESH_TOKEN
+});
 
 const app = express();
 const port = process.env.PORT || 3000;
