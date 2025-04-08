@@ -1,6 +1,6 @@
 {
   "name": "google-ads-mcp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Google Ads Message Control Protocol for n8n integration",
   "main": "src/index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "lint": "eslint src/**/*.js"
   },
   "dependencies": {
-    "google-ads-api": "^12.0.0",
+    "google-ads-api": "^19.0.2-rest-beta",
     "express": "^4.18.2",
     "dotenv": "^16.0.3",
     "winston": "^3.8.2",
