@@ -7,12 +7,13 @@ A Message Control Protocol (MCP) for Google Ads integration with n8n. This MCP p
 - Bid and Budget Control
 - Campaign Performance Analysis
 - Creative Performance Analysis
+- Client Account Management
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
 - Google Ads API access
-- Google Ads Developer Token
+- Google Ads Developer Token with at least Basic Access level
 - Google Ads API credentials (Client ID and Client Secret)
 
 ## Installation
@@ -28,7 +29,7 @@ cd google-ads-mcp
 npm install
 ```
 
-3. Create a `.env` file in the root directory with the following variables:
+3. Create a `.env` file in the root directory with the following variables (use `.env.example` as a template):
 ```
 GOOGLE_ADS_CLIENT_ID=your_client_id
 GOOGLE_ADS_CLIENT_SECRET=your_client_secret
@@ -37,6 +38,8 @@ GOOGLE_ADS_CUSTOMER_ID=your_customer_id
 GOOGLE_ADS_REFRESH_TOKEN=your_refresh_token
 PORT=3000
 ```
+
+> **Note:** For `GOOGLE_ADS_CUSTOMER_ID`, you can use either a manager account ID (MCC) or a specific client account ID. If using a manager account, certain metrics will only be available when accessing client accounts.
 
 ## Usage
 
@@ -89,6 +92,24 @@ GET /api/v1/creative/performance?creativeId=123456789&dateRange=LAST_30_DAYS
 ```
 GET /api/v1/creative/metrics?creativeId=123456789&metrics=metrics.impressions,metrics.clicks,metrics.cost_micros
 ```
+
+### Client Account Management
+
+#### List Client Accounts
+```
+GET /api/v1/accounts
+```
+This endpoint returns the list of available client accounts if you're using a manager account (MCC).
+
+## Google Ads API Access Levels
+
+This MCP supports different Google Ads API access levels:
+
+- **Test Account Access**: Limited to test accounts only
+- **Basic Access**: Can access real client accounts with limited quota
+- **Standard Access**: Full access with higher quota limits
+
+For production use, we recommend applying for at least Basic Access through the Google Ads API Center.
 
 ## n8n Integration
 
