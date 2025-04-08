@@ -11,6 +11,7 @@ class GoogleAdsController {
     this.getCampaignMetrics = this.getCampaignMetrics.bind(this);
     this.getCreativePerformance = this.getCreativePerformance.bind(this);
     this.getCreativeMetrics = this.getCreativeMetrics.bind(this);
+    this.listClientAccounts = this.listClientAccounts.bind(this);
   }
 
   updateBidAndBudget = async (req, res) => {
@@ -75,6 +76,16 @@ class GoogleAdsController {
       res.json(creativeMetrics);
     } catch (error) {
       logger.error('Error getting creative metrics:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  listClientAccounts = async (req, res) => {
+    try {
+      const accounts = await this.googleAdsService.listClientAccounts();
+      res.json(accounts);
+    } catch (error) {
+      logger.error('Error listing client accounts:', error);
       res.status(500).json({ error: error.message });
     }
   }

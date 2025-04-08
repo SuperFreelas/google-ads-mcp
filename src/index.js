@@ -37,6 +37,9 @@ app.get('/api/v1/campaign/metrics', googleAdsController.getCampaignMetrics);
 app.get('/api/v1/creative/performance', googleAdsController.getCreativePerformance);
 app.get('/api/v1/creative/metrics', googleAdsController.getCreativeMetrics);
 
+// Route for listing client accounts
+app.get('/api/v1/accounts', googleAdsController.listClientAccounts);
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'healthy' });

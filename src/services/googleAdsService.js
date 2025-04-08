@@ -9,8 +9,12 @@ class GoogleAdsService {
       developer_token: process.env.GOOGLE_ADS_DEVELOPER_TOKEN
     });
 
+    // Ensure customer ID is in the correct format (remove any non-numeric characters)
+    const customerId = process.env.GOOGLE_ADS_CUSTOMER_ID.replace(/\D/g, '');
+    logger.info(`Using customer ID: ${customerId}`);
+
     this.customer = this.client.Customer({
-      customer_id: process.env.GOOGLE_ADS_CUSTOMER_ID,
+      customer_id: customerId,
       refresh_token: process.env.GOOGLE_ADS_REFRESH_TOKEN
     });
   }
@@ -58,13 +62,16 @@ class GoogleAdsService {
           metrics.clicks,
           metrics.cost_micros,
           metrics.conversions,
-          metrics.average_cpc
+          metrics.average_cpc,
+          metrics.ctr
         FROM campaign
-        WHERE campaign.id = '${campaignId}'
+        WHERE campaign.id = ${campaignId}
         AND segments.date DURING ${dateRange}
       `;
 
+      logger.info(`Executing query: ${query}`);
       const response = await this.customer.query(query);
+      logger.info(`Query response: ${JSON.stringify(response)}`);
       return response;
     } catch (error) {
       logger.error('Error in getCampaignPerformance:', error);
@@ -78,9 +85,9 @@ class GoogleAdsService {
         SELECT 
           campaign.id,
           campaign.name,
-          ${metrics.join(', ')}
+          ${metrics.join(',')}
         FROM campaign
-        WHERE campaign.id = '${campaignId}'
+        WHERE campaign.id = ${campaignId}
       `;
 
       const response = await this.customer.query(query);
@@ -101,9 +108,10 @@ class GoogleAdsService {
           metrics.clicks,
           metrics.cost_micros,
           metrics.conversions,
-          metrics.average_cpc
+          metrics.average_cpc,
+          metrics.ctr
         FROM ad_group_ad
-        WHERE ad_group_ad.ad.id = '${creativeId}'
+        WHERE ad_group_ad.ad.id = ${creativeId}
         AND segments.date DURING ${dateRange}
       `;
 
@@ -121,15 +129,38 @@ class GoogleAdsService {
         SELECT 
           ad_group_ad.ad.id,
           ad_group_ad.ad.name,
-          ${metrics.join(', ')}
+          ${metrics.join(',')}
         FROM ad_group_ad
-        WHERE ad_group_ad.ad.id = '${creativeId}'
+        WHERE ad_group_ad.ad.id = ${creativeId}
       `;
 
       const response = await this.customer.query(query);
       return response;
     } catch (error) {
       logger.error('Error in getCreativeMetrics:', error);
+      throw error;
+    }
+  }
+
+  async listClientAccounts() {
+    try {
+      const query = `
+        SELECT
+          customer_client.id,
+          customer_client.descriptive_name,
+          customer_client.currency_code,
+          customer_client.time_zone,
+          customer_client.status
+        FROM customer_client
+        WHERE customer_client.status = 'ENABLED'
+      `;
+      
+      logger.info(`Executing query to list client accounts: ${query}`);
+      const response = await this.customer.query(query);
+      logger.info(`Client accounts response: ${JSON.stringify(response)}`);
+      return response;
+    } catch (error) {
+      logger.error('Error in listClientAccounts:', error);
       throw error;
     }
   }
