@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2025-04-08
+
+### Added
+- **Unified API Gateway**: Novo endpoint `/api/v1/execute` que funciona como ponto único de entrada para todas as operações
+- Documentação auto-gerada via endpoint `listAvailableActions`
+- Simplificação da integração com ferramentas como n8n
+- Melhoria na validação de parâmetros e tratamento de erros
+
 ## [1.1.0] - 2025-04-08
 
 ### Added

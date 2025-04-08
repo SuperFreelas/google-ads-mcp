@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const { GoogleAdsController } = require('./controllers/googleAdsController');
+const { GatewayController } = require('./controllers/gatewayController');
 const { logger } = require('./utils/logger');
 
 // Load environment variables
@@ -22,8 +23,12 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// Initialize Google Ads Controller
+// Initialize controllers
 const googleAdsController = new GoogleAdsController();
+const gatewayController = new GatewayController();
+
+// Unified API Gateway endpoint
+app.post('/api/v1/execute', gatewayController.execute);
 
 // Routes for bid and budget control
 app.post('/api/v1/bid-budget/update', googleAdsController.updateBidAndBudget);
@@ -53,4 +58,5 @@ app.get('/health', (req, res) => {
 
 app.listen(port, () => {
   logger.info(`Google Ads MCP server running on port ${port}`);
+  logger.info(`Unified API Gateway available at: http://localhost:${port}/api/v1/execute`);
 }); 

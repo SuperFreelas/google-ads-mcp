@@ -9,6 +9,7 @@ A Message Control Protocol (MCP) for Google Ads integration with n8n. This MCP p
 - Creative Performance Analysis
 - Client Account Management
 - Support for both manager (MCC) and client accounts
+- **NEW: Unified API Gateway** for simplified integration
 
 ## Prerequisites
 
@@ -57,9 +58,87 @@ pm2 start src/index.js --name google-ads-mcp
 
 ## API Endpoints
 
-### Bid and Budget Control
+### Unified API Gateway (Recommended)
+
+The MCP now provides a unified API gateway that allows executing any operation through a single endpoint:
+
+```
+POST /api/v1/execute
+Content-Type: application/json
+
+{
+  "action": "actionName",
+  "parameters": {
+    "param1": "value1",
+    "param2": "value2"
+  }
+}
+```
+
+To discover all available actions:
+
+```
+POST /api/v1/execute
+Content-Type: application/json
+
+{
+  "action": "listAvailableActions"
+}
+```
+
+This will return a complete list of all available actions with their parameters and descriptions.
+
+### Examples of Using the Unified API
+
+#### List All Campaigns
+```
+POST /api/v1/execute
+Content-Type: application/json
+
+{
+  "action": "listAllCampaigns",
+  "parameters": {
+    "status": "ENABLED"
+  }
+}
+```
+
+#### Get Campaign Performance
+```
+POST /api/v1/execute
+Content-Type: application/json
+
+{
+  "action": "getCampaignPerformance",
+  "parameters": {
+    "campaignId": "123456789",
+    "dateRange": "LAST_30_DAYS"
+  }
+}
+```
 
 #### Update Bid and Budget
+```
+POST /api/v1/execute
+Content-Type: application/json
+
+{
+  "action": "updateBidAndBudget",
+  "parameters": {
+    "campaignId": "123456789",
+    "newBid": 1.50,
+    "newBudget": 1000
+  }
+}
+```
+
+### Individual API Endpoints (Legacy)
+
+The following individual endpoints are still available but using the unified gateway is recommended:
+
+#### Bid and Budget Control
+
+##### Update Bid and Budget
 ```
 POST /api/v1/bid-budget/update
 Content-Type: application/json
@@ -72,53 +151,77 @@ Content-Type: application/json
 ```
 > **Note:** Due to limitations in the Google Ads API REST Beta, bid updates are currently simulated. Only budget updates would work with the full API implementation.
 
-#### Get Bid and Budget Status
+##### Get Bid and Budget Status
 ```
 GET /api/v1/bid-budget/status?campaignId=123456789
 ```
 
-### Campaign Performance
+#### Campaign Performance
 
-#### Get Campaign Performance
+##### Get Campaign Performance
 ```
 GET /api/v1/campaign/performance?campaignId=123456789&dateRange=LAST_30_DAYS
 ```
 > Supported date ranges: TODAY, YESTERDAY, LAST_7_DAYS, LAST_14_DAYS, LAST_30_DAYS, LAST_BUSINESS_WEEK, etc.
 
-#### Get Campaign Metrics
+##### Get Campaign Metrics
 ```
 GET /api/v1/campaign/metrics?campaignId=123456789&metrics=metrics.impressions,metrics.clicks,metrics.cost_micros
 ```
 
-### Creative Performance
+#### Creative Performance
 
-#### Get Creative Performance
+##### Get Creative Performance
 ```
 GET /api/v1/creative/performance?creativeId=123456789&dateRange=LAST_30_DAYS
 ```
 
-#### Get Creative Metrics
+##### Get Creative Metrics
 ```
 GET /api/v1/creative/metrics?creativeId=123456789&metrics=metrics.impressions,metrics.clicks,metrics.cost_micros
 ```
 
-### Client Account Management
+#### Client Account Management
 
-#### List Client Accounts
+##### List Client Accounts
 ```
 GET /api/v1/accounts
 ```
 This endpoint returns the list of available client accounts if you're using a manager account (MCC).
 
-#### List Campaigns for a Specific Account
+##### List Campaigns for a Specific Account
 ```
 GET /api/v1/campaigns?accountId=1234567890
 ```
 
-#### List All Campaigns Across All Client Accounts
+##### List All Campaigns Across All Client Accounts
 ```
 GET /api/v1/campaigns/all
 ```
+
+## n8n Integration
+
+### Using the Unified API with n8n
+
+The easiest way to integrate with n8n is to use the HTTP Request node with the unified API gateway:
+
+1. Add an HTTP Request node to your workflow
+2. Configure it as follows:
+   - Method: POST
+   - URL: http://your-mcp-server:3000/api/v1/execute
+   - Body Content Type: JSON
+   - Request Body:
+     ```json
+     {
+       "action": "listAllCampaigns",
+       "parameters": {
+         "status": "ENABLED"
+       }
+     }
+     ```
+3. You can then use the output in subsequent nodes
+
+This approach allows you to execute any MCP operation through a single HTTP Request node, simplifying your workflows.
 
 ## Implementation Details
 
@@ -150,21 +253,6 @@ This MCP supports different Google Ads API access levels:
 - **Standard Access**: Full access with higher quota limits
 
 For production use, we recommend applying for at least Basic Access through the Google Ads API Center.
-
-## n8n Integration
-
-To integrate this MCP with n8n:
-
-1. Install the n8n-mcp-nodes package in your n8n instance
-2. Configure the MCP node with your MCP server URL
-3. Use the available operations to interact with your Google Ads account
-
-## Error Handling
-
-The MCP includes comprehensive error handling and logging. All errors are logged to provide better visibility:
-- Query failures are logged with detailed error messages
-- API connectivity issues are clearly reported
-- Client account discovery failures are tracked
 
 ## Troubleshooting
 
