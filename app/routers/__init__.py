@@ -1,0 +1,1 @@
+from app.routers.gateway import router as gateway_router 
